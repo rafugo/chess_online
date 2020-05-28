@@ -2,6 +2,8 @@ import React from 'react';
 import Board from './board.js';
 import CapturedPieces from './capturedPieces.js';
 import setupBoard from '../setupBoard.js';
+import King from '../pieces/king';
+import Rook from '../pieces/rook';
 
 export default class Game extends React.Component {
     constructor() {
@@ -33,7 +35,6 @@ export default class Game extends React.Component {
     }
 
     handleNoPieceSelected(squares, i, j) {
-        console.log(this.state.sourceSelection)
         // if the wrong piece/square is selected
         if(!squares[i][j] || squares[i][j].color !== this.state.turn){
             this.setState({status: "Wrong selection. Choose a " + this.state.turn + " piece."});
@@ -75,9 +76,41 @@ export default class Game extends React.Component {
             return false;
         
         } else {
+            var isMovePossible = false;
             const isEnemyAtDestination = squares[i][j] ? true : false;
 
-            const isMovePossible = squares[this.state.sourceSelection[0]][this.state.sourceSelection[1]].checkPossibleMove([i, j], isEnemyAtDestination);
+            // special castling logic
+            if (squares[this.state.sourceSelection[0]][this.state.sourceSelection[1]] instanceof King) {
+
+                const kingPiece = squares[this.state.sourceSelection[0]][this.state.sourceSelection[1]];
+
+                const move = [
+                    i - this.state.sourceSelection[0], 
+                    j - this.state.sourceSelection[1]
+                ];
+
+                // if the king wants to castle
+                if (kingPiece.checkListForTuple(kingPiece.castlingMoveset, move)) {
+                    // kingside
+                    if (move[1] > 0) {
+                        if (squares[i][7] instanceof Rook && squares[i][7].hasMoved === false) {
+                            isMovePossible = kingPiece.checkPossibleMove([i, j], isEnemyAtDestination);
+                        }
+                    // queenside
+                    } else {
+                        if (squares[i][0] instanceof Rook && squares[i][0].hasMoved === false) {
+                            isMovePossible = kingPiece.checkPossibleMove([i, j], isEnemyAtDestination);
+                        }
+                    }
+                } else {
+                    isMovePossible = kingPiece.checkPossibleMove([i, j], isEnemyAtDestination);
+                }
+
+            } else {
+                isMovePossible = squares[this.state.sourceSelection[0]][this.state.sourceSelection[1]].checkPossibleMove([i, j], isEnemyAtDestination);
+            }
+
+            
             
             // if piece does not move how it should
             if ( !isMovePossible ) {
@@ -121,6 +154,37 @@ export default class Game extends React.Component {
         squares[i][j] = squares[this.state.sourceSelection[0]][this.state.sourceSelection[1]];
         squares[this.state.sourceSelection[0]][this.state.sourceSelection[1]] = null;
         squares[i][j].position = [i, j];
+
+        if (squares[i][j] instanceof Rook) {
+            squares[i][j].hasMoved = true;
+        }
+
+        if (squares[i][j] instanceof King) {
+            squares[i][j].hasMoved = true;
+
+            const move = [
+                i - this.state.sourceSelection[0], 
+                j - this.state.sourceSelection[1]
+            ];
+
+            if (squares[i][j].checkListForTuple(squares[i][j].castlingMoveset, move)) {
+                this.performCastle(squares, i, j);
+            }
+        }
+    }
+
+    performCastle(squares, i, j) {
+
+        // handle castling by moving the corresponding rook if needed
+        if (j === 6) {
+            squares[i][5] = squares[i][7];
+            squares[i][7] = null;
+            squares[i][5].position = [i, j-1];
+        } else {
+            squares[i][3] = squares[i][0];
+            squares[i][0] = null;
+            squares[i][3].position = [i, 3];
+        }
     }
 
     handleCapturedPiece(squares, i, j) {
@@ -138,7 +202,6 @@ export default class Game extends React.Component {
         for (let i=0; i < movePath.length; i++) {
             var stepRow = movePath[i][0];
             var stepCol = movePath[i][1];
-            console.log(movePath);
             // if there's any object in the way, not valid
             if (this.state.squares[stepRow][stepCol] !== null) {
                 return false;

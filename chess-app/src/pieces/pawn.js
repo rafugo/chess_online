@@ -36,21 +36,16 @@ export default class Pawn extends Piece {
             destination[0] - this.position[0], 
             destination[1] - this.position[1]
         ];
-        console.log({
-            'position: ': this.position,
-            'destination: ': destination,
-            'move': move
-        });
 
         if (isEnemyAtDestination) {
-            return this.checkListforTuple(this.captureMoveSet, move);
+            return this.checkListForTuple(this.captureMoveSet, move);
 
         } else if (this.position[0] === this.startingRow) {
 
-            return this.checkListforTuple(this.firstMoveSet, move);
+            return this.checkListForTuple(this.firstMoveSet, move);
             
         } else {
-            return this.checkListforTuple(this.moveSet, move);
+            return this.checkListForTuple(this.moveSet, move);
         };
     };
 
@@ -61,10 +56,10 @@ export default class Pawn extends Piece {
         const move = [destination[0] - this.position[0], 
                         destination[1] - this.position[1]];
         
-        if (this.checkListforTuple(this.captureMoveSet, move) || this.checkListforTuple(this.moveSet, move)) {
+        if (this.checkListForTuple(this.captureMoveSet, move) || this.checkListForTuple(this.moveSet, move)) {
             return [];
 
-        } else if (this.checkListforTuple(this.firstMoveSet, move)) {
+        } else if (this.checkListForTuple(this.firstMoveSet, move)) {
             return [[this.position[0]+this.direction, this.position[1]]];
 
         } else {

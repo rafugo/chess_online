@@ -9,6 +9,7 @@ export default class Rook extends Piece {
             super(color, "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg");
         };
         this.position = position;
+        this.hasMoved = false;
     };
 
     checkPossibleMove(destination) {

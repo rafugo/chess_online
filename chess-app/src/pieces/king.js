@@ -10,7 +10,7 @@ export default class King extends Piece {
         };
 
         this.position = position;
-        this.startingPosition = position;
+        this.hasMoved = false;
 
         this.moveset = [
             [-1, -1],
@@ -29,13 +29,19 @@ export default class King extends Piece {
         ];
     };
 
-    checkPossibleMove(destination) {
+    checkPossibleMove(destination, isEnemyAtDestination) {
         var move = [
             destination[0] - this.position[0], 
             destination[1] - this.position[1]
         ];
 
-        return this.checkListforTuple(this.moveset, move);
+        if (isEnemyAtDestination || this.hasMoved) {
+            return this.checkListForTuple(this.moveset, move);
+
+        // castling allowed
+        } else {
+            return this.checkListForTuple(this.castlingMoveset, move) || this.checkListForTuple(this.moveset, move);
+        }
     };
 
     getMovePath(destination) {

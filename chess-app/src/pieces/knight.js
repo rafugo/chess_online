@@ -28,7 +28,7 @@ export default class Knight extends Piece {
             destination[0] - this.position[0], 
             destination[1] - this.position[1]
         ];
-        return this.checkListforTuple(this.moveset, move);
+        return this.checkListForTuple(this.moveset, move);
     };
 
     getMovePath(destination) {
