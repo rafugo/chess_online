@@ -45,7 +45,7 @@ export default class Game extends React.Component {
         
         // if the right color piece is selected
         } else {
-            squares[i][j].style = {...squares[i][j].style, backgroundColor: "RGB(111,143,114)"}; // Emerald from http://omgchess.blogspot.com/2015/09/chess-board-color-schemes.html
+            squares[i][j].style = {...squares[i][j].style, backgroundColor: "RGB(255, 255, 158)"};
             
 
             this.setState({
